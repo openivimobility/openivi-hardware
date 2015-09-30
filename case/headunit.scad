@@ -121,23 +121,47 @@ module teeth() {
 }
 
 module half_printablevolume() {
-		translate([-1,-1,-1]) cube([w+2, d+2, h/2+1]);
-		translate([wall/2, 0, h/2-5]) teeth();
-		translate([w-wall/2, 0, h/2-5]) teeth();
+		translate([0,0,-10]) {
+			translate([-1,-1,-1]) cube([w+2, d+2, h/2+1]);
+			translate([wall/2, 0, h/2-5]) teeth();
+			translate([w-wall/2, 0, h/2-5]) teeth();
+		}
+}
+
+
+module chop_front() {
+	translate([0, -1, -1]) {
+		cube([w+2, 20+1, h_front+2]);
+	}
 }
 
 module printable() {
 
+	// Bottom
 	intersection() {
 		case();
 		half_printablevolume();
 	}
 
+	// Top front
 	translate([0,0,20])
 	difference() {
-		case();
+		intersection() {
+			case();
+			translate([0, -0.001, 0]) chop_front(); // Hack!
+		}
 		half_printablevolume();
 	}
+	// Top rear
+	translate([0,20,20])
+	difference() {
+		difference() {
+			case();
+			chop_front();
+		}
+		half_printablevolume();
+	}
+
 }
 
 module slice() {
